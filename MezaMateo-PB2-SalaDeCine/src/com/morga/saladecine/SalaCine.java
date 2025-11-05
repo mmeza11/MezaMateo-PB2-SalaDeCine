@@ -1,37 +1,32 @@
 package com.morga.saladecine;
 
+import java.util.*;
+
 public class SalaCine {
-	private Asiento[][] butacas;
+	private Map<String, Asiento> butacas;
 	private Pelicula pelicula;
 
-	public SalaCine(int fila, int columna) {
-		this.butacas = new Asiento[fila][columna];
+	public SalaCine() {
+		this.butacas = new TreeMap<>();
 
-		for (int i = 0; i < fila; i++) {
-			for (int j = 0; j < columna; j++) {
-				this.butacas[i][j] = new Asiento();
-			}
-		}
 	}
 
-	public Asiento[][] getButacas() {
-		return butacas;
+	public int getButacas() {
+		return butacas.size();
 	}
 
 	public int contarAsientosOcupados() {
 		int contador = 0;
-		for (int i = 0; i < butacas.length; i++) {
-			for (int j = 0; j < butacas[i].length; j++) {
-				if (this.butacas[i][j].estaOcupado())
-					contador++;
-
-			}
+		for (Asiento asiento : this.butacas.values()) {
+			if (asiento.estaOcupado())
+				contador++;
 		}
+
 		return contador;
 	}
 
 	public int getTotalAsientos() {
-		return butacas.length * butacas[0].length;
+		return butacas.size();
 	}
 
 	public void cambiarPelicula(Pelicula pelicula) {
@@ -42,61 +37,68 @@ public class SalaCine {
 		return pelicula;
 	}
 
-	public boolean venderBoleto(int fila, int columna, int edad, String nombreComprador) {
+	public void venderBoleto(String lugar, int edad, String nombreComprador) throws Exception {
 
-		if (butacas[fila][columna].estaOcupado())
-			return false;
+		Asiento asiento = this.butacas.get(lugar);
 
-		if (this.pelicula.getEdadMinima() > edad)
-			return false;
+		if (nombreComprador == null || asiento == null) throw new Exception();
+		if (asiento.estaOcupado()) throw new Exception();
+		if (this.pelicula.getEdadMinima() > edad) throw new Exception();
 
-		if (nombreComprador == null)
-			return false;
-
-		butacas[fila][columna].ocupar(nombreComprador);
-		return true;
+		asiento.ocupar(nombreComprador);
 	}
 
 	public String getTitulo() {
 		return pelicula.getTitulo();
 	}
 
-	public boolean liberarAsiento(int fila, int columna) {
-		if (fila < 0 || columna < 0)
-			return false;
+	public void liberarAsiento(String lugar) throws Exception {
+		Asiento asiento = this.butacas.get(lugar);
+		if (asiento == null || !asiento.estaOcupado()) throw new Exception();
+		asiento.liberar();
 
-		if (fila <= butacas.length && columna <= butacas[0].length) {
-			butacas[fila][columna].liberar();
-			return true;
-		}
-		return false;
 	}
 
 	public void reiniciarSala() {
-		for (int i = 0; i < butacas.length; i++) {
-			for (int j = 0; j < butacas[i].length; j++) {
-				this.butacas[i][j] = new Asiento();
-			}
+		for (Asiento asiento : this.butacas.values()) {
+			asiento.liberar();
 		}
-
 	}
 
 	public String mostrarButacasDetalle() {
-		String butacasDetalle = "";
-		for (int i = 0; i < butacas.length; i++) {
-			for (int j = 0; j < butacas[i].length; j++) {
-				String estado = this.butacas[i][j].estaOcupado() ? "\nButaca Fila " + i + ", Columna " + j + 
-						" está ocupada por: "+ this.butacas[i][j].getNombreComprador() + ".": "\nButaca Fila " + i + ", Columna " + j + " está libre.";
-				butacasDetalle += estado;
-				}
+		String estado = "";
 
+		for (Map.Entry<String, Asiento> entry : butacas.entrySet()) {
+			String lugar = entry.getKey();
+			Asiento asiento = entry.getValue();
+
+			if (asiento.estaOcupado()) {
+				estado += "Butaca " + lugar + " está ocupada por: " + asiento.getNombreComprador() + "\n";
+			} else {
+				estado += "Butaca " + lugar + " está libre\n";
 			}
-		
-
-		return butacasDetalle;
-	}
-
 		}
 
+		return estado;
+
+	}
+
+	public void agregarButaca(String lugar) {
+		this.butacas.put(lugar, new Asiento());
+	}
 
 
+	/*
+	 * } String butacasDetalle = ""; for (int i = 0; i < butacas.length; i++) { for
+	 * (int j = 0; j < butacas[i].length; j++) { String estado =
+	 * this.butacas[i][j].estaOcupado() ? "\nButaca Fila " + i + ", Columna " + j +
+	 * " está ocupada por: " + this.butacas[i][j].getNombreComprador() + "." :
+	 * "\nButaca Fila " + i + ", Columna " + j + " está libre."; butacasDetalle +=
+	 * estado; }
+	 * 
+	 * }
+	 * 
+	 * return butacasDetalle; }
+	 */
+
+}

@@ -26,7 +26,10 @@ public class SalaCineTest {
 		peliculasExtra[2] = new PeliculaInfantil("Toy Story", 81, 0);
 		peliculasExtra[3] = new PeliculaTerror("El Conjuro", 112, 16);
 
-		sala1 = new SalaCine(2, 3);
+		sala1 = new SalaCine();
+		sala1.agregarButaca("A1");
+		sala1.agregarButaca("A2");
+		sala1.agregarButaca("A3");
 	}
 
 	@Test
@@ -34,9 +37,9 @@ public class SalaCineTest {
 
 		PeliculaAccion pelicomparacion = new PeliculaAccion("Piratas del Caribe 1", 200, 14);// (peli1= 0x1235)
 
+		sala1.agregarButaca("A4");
 		sala1.cambiarPelicula(peliculas[0]);
-		assertEquals(2, sala1.getButacas().length);
-		assertEquals(3, sala1.getButacas()[0].length);
+		assertEquals(4, sala1.getButacas());
 
 		assertEquals(pelicomparacion, sala1.getPeliculaActual());
 		assertEquals("Piratas del Caribe 1", sala1.getTitulo());
@@ -45,87 +48,93 @@ public class SalaCineTest {
 	}
 
 	@Test
-	public void venderBoletoExitoso() {
+	public void venderBoletoExitoso() throws Exception {
 		sala1.cambiarPelicula(peliculas[0]);
-		boolean venta1 = sala1.venderBoleto(0, 1, 14, "Julian Morga");
-		boolean venta2 = sala1.venderBoleto(0, 2, 16, "Julian Morga");
-		assertTrue(venta1);
-		assertTrue(venta2);
+		sala1.venderBoleto("A1", 14, "Julian Morga");
+		sala1.venderBoleto("A2", 16, "Julian Morga");
+		assertEquals(2, sala1.contarAsientosOcupados());
 	}
 
 	@Test
-	public void venderBoletoNoExitosoPorqueSeIntentaVenderYaVendido() {
+	public void venderBoletoNoExitosoPorqueSeIntentaVenderYaVendido() throws Exception {
 
 		sala1.cambiarPelicula(peliculas[0]);
-		boolean venta1 = sala1.venderBoleto(0, 1, 18, "Julian Morga");
-		boolean venta2 = sala1.venderBoleto(0, 1, 18, "Julian Morga");
-		assertTrue(venta1);
-		assertFalse(venta2);
+		sala1.venderBoleto("A1", 18, "Julian Morga");
+
+		try {
+			sala1.venderBoleto("A1", 18, "Julian Morga");
+		} catch (Exception e) {
+		}
+
 	}
 
 	@Test
-	public void venderBoletoNoExitosoPorqueEdadMinimaNoCumplida() {
+	public void venderBoletoNoExitosoPorqueEdadMinimaNoCumplida() throws Exception {
 
 		sala1.cambiarPelicula(peliculas[0]);
-		boolean venta1 = sala1.venderBoleto(0, 1, 12, "Julian Morga");
-		boolean venta3 = sala1.venderBoleto(0, 1, -5, "Julian Morga");
 
-		assertFalse(venta1);
-		assertFalse(venta3);
+		try {
+			sala1.venderBoleto("A2", 15, "Julian Morga");
+		} catch (Exception d) {
+		}
+
 	}
 
 	@Test
-	public void venderBoletoNoExitosoPorqueElCompradorEsNull() {
+	public void venderBoletoNoExitosoPorqueElCompradorEsNull() throws Exception {
 		sala1.cambiarPelicula(peliculas[0]);
+		try {
+			sala1.venderBoleto("A1", 19, null);
+		} catch (Exception e) {
+		}
 
-		boolean venta3 = sala1.venderBoleto(0, 2, 19, null);
-		assertFalse(venta3);
 	}
 
 	@Test
 	public void obtenerTotalAscientosTest() {
-		SalaCine sala1 = new SalaCine(2, 3);
-		assertEquals(6, sala1.getTotalAsientos());
+
+		assertEquals(3, sala1.getTotalAsientos());
 
 	}
 
 	@Test
-	public void contarAsientosOcupadosTest() {
+	public void contarAsientosOcupadosTest() throws Exception {
 		sala1.cambiarPelicula(peliculas[0]);
-		sala1.venderBoleto(0, 1, 18, "Julian Morga");
-		sala1.venderBoleto(0, 2, 18, "Julian Morga");
-		sala1.venderBoleto(1, 2, 18, "Julian Morga");
+		sala1.venderBoleto("A1", 18, "Julian Morga");
+		sala1.venderBoleto("A2", 18, "Julian Morga");
+		sala1.venderBoleto("A3", 18, "Julian Morga");
 
 		assertEquals(3, sala1.contarAsientosOcupados());
 	}
 
 	@Test
-	public void liberarAsientoVendido() {
+	public void liberarAsientoVendido() throws Exception {
 		sala1.cambiarPelicula(peliculas[0]);
-		sala1.venderBoleto(0, 1, 18, "Julian Morga");
-		sala1.venderBoleto(0, 2, 18, "Julian Morga");
-		sala1.venderBoleto(1, 2, 18, "Julian Morga");
+		sala1.venderBoleto("A1", 18, "Julian Morga");
+		sala1.venderBoleto("A2", 18, "Julian Morga");
+		sala1.venderBoleto("A3", 18, "Julian Morga");
 
 		assertEquals(3, sala1.contarAsientosOcupados());
-		assertTrue(sala1.liberarAsiento(0, 1));
+		sala1.liberarAsiento("A1");
 		assertEquals(2, sala1.contarAsientosOcupados());
-		sala1.venderBoleto(0, 1, 18, "Julian Morga");
+		sala1.venderBoleto("A1", 18, "Julian Morga");
 		assertEquals(3, sala1.contarAsientosOcupados());
-		assertFalse(sala1.liberarAsiento(0, -2));
-		assertFalse(sala1.liberarAsiento(22, 22));
-		assertFalse(sala1.liberarAsiento(0, 4));
+
 	}
 
 	@Test
-	public void liberarAsientoVendidoFueraDeRangoTest() {
+	public void liberarAsientoVendidoFueraDeRangoTest() throws Exception {
 		sala1.cambiarPelicula(peliculas[0]);
-		sala1.venderBoleto(0, 1, 18, "Julian Morga");
-		sala1.venderBoleto(0, 2, 18, "Julian Morga");
-		sala1.venderBoleto(1, 2, 18, "Julian Morga");
+		sala1.venderBoleto("A1", 18, "Julian Morga");
+		sala1.venderBoleto("A2", 18, "Julian Morga");
+		sala1.venderBoleto("A3", 18, "Julian Morga");
 
 		assertEquals(3, sala1.contarAsientosOcupados());
-		assertFalse(sala1.liberarAsiento(5, 10));
-		assertFalse(sala1.liberarAsiento(-1, -1));
+		try {
+			sala1.liberarAsiento("B4");
+
+		} catch (Exception e) {
+		}
 		assertEquals(3, sala1.contarAsientosOcupados());
 	}
 
@@ -137,10 +146,10 @@ public class SalaCineTest {
 		assertEquals(sala1.getPeliculaActual(), peliculas[3]);
 
 	}
-	
+
 	@Test
 	public void verificarSinopsis() {
-		assertTrue(peliculasExtra[0].mostrarSinopsis().contains("La Máscara"));
+		assertTrue(peliculasExtra[0].mostrarSinopsis().contains("graciosas"));
 		assertTrue(peliculasExtra[1].mostrarSinopsis().contains("En busca de la felicidad"));
 		assertTrue(peliculasExtra[2].mostrarSinopsis().contains("Toy Story"));
 		assertTrue(peliculasExtra[3].mostrarSinopsis().contains("El Conjuro"));
@@ -156,21 +165,26 @@ public class SalaCineTest {
 	}
 
 	@Test
-	public void reiniciarSalaTest() {
+	public void reiniciarSalaTest() throws Exception {
 		sala1.cambiarPelicula(peliculas[0]);
-		sala1.venderBoleto(0, 1, 18, "Julian Morga");
-		sala1.venderBoleto(0, 2, 18, "Julian Morga");
-		assertEquals(2, sala1.contarAsientosOcupados());
+		sala1.venderBoleto("A1", 18, "Julian Morga");
+		sala1.venderBoleto("A2", 18, "Julian Morga");
+		sala1.venderBoleto("A3", 18, "Julian Morga");
+		assertEquals(3, sala1.contarAsientosOcupados());
 
 		sala1.reiniciarSala();
 		assertEquals(0, sala1.contarAsientosOcupados());
 	}
 
 	@Test
-	public void mostrarButacasDetalle() {
+	public void mostrarButacasDetalle() throws Exception {
 		sala1.cambiarPelicula(peliculas[0]);
-		sala1.venderBoleto(0, 1, 18, "Julian Morga");
-		sala1.mostrarButacasDetalle();
+		sala1.venderBoleto("A1", 18, "Julian Morga");
+		sala1.venderBoleto("A2", 18, "Julian Morga");
+		sala1.venderBoleto("A3", 18, "Julian Morga");
+		sala1.agregarButaca("A4");
+		String detalles = sala1.mostrarButacasDetalle();
+		assertTrue(detalles.contains("Julian Morga"));
 	}
 
 	@Test

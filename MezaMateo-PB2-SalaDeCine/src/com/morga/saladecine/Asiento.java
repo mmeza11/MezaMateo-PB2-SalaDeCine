@@ -8,9 +8,9 @@ public class Asiento {
 		this.liberar();
 	}
 	
-	public Asiento(String nombreComprador, boolean estado) {
+	public Asiento(String nombreComprador, boolean ocupado) {
 		this.nombreComprador = nombreComprador;
-		this.ocupado = estado;
+		this.ocupado = ocupado;
 	}
 	
 	public String getNombreComprador() {
@@ -23,12 +23,13 @@ public class Asiento {
 	}
 	
 	public void liberar() {
-		this.nombreComprador = "";
+		this.nombreComprador = null;
 		this.ocupado = false;
 	}
 	
 	public boolean estaOcupado() {
 		return ocupado;
-	}	
+	}
+
 	
 }
