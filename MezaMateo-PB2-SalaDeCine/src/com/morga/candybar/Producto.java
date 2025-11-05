@@ -5,13 +5,11 @@ import java.util.Objects;
 public abstract class Producto implements Comparable<Producto> {
 	protected String nombre;
 	protected double precioBase;
-	protected Enum tipo;
 	protected int stock;
 
-	public Producto(String nombre, double precioBase, Enum tipo, int stock) {
+	public Producto(String nombre, double precioBase, int stock) {
 		this.nombre = nombre;
 		this.precioBase = precioBase;
-		this.tipo = tipo;
 		this.stock = stock;
 	}
 	
